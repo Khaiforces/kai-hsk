@@ -4,6 +4,14 @@ The site uses Firebase Authentication to create or sign in to a KaiHSK account
 with Google. Firebase manages the OAuth flow and keeps the signed-in session in
 the browser.
 
+## Publish on GitHub Pages
+
+The `Deploy KaiHSK to GitHub Pages` workflow publishes `index.html` and
+`firebase-config.js` whenever code is pushed to `main`. Once the workflow
+finishes successfully, open
+[`https://khaiforces.github.io/kai-hsk/`](https://khaiforces.github.io/kai-hsk/).
+You can also run the workflow manually from the repository's **Actions** tab.
+
 ## Configure Firebase
 
 1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/).

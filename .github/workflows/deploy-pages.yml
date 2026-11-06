@@ -33,9 +33,7 @@ jobs:
       - name: Upload website files
         uses: actions/upload-pages-artifact@v3
         with:
-          path: |
-            index.html
-            firebase-config.js
+          path: .
 
       - name: Deploy website
         id: deployment

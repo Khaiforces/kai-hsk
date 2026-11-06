@@ -12,6 +12,14 @@ finishes successfully, open
 [`https://khaiforces.github.io/kai-hsk/`](https://khaiforces.github.io/kai-hsk/).
 You can also run the workflow manually from the repository's **Actions** tab.
 
+## HSK vocabulary list
+
+The **Từ vựng** section includes a curated starter list for HSK 1–2. Search by
+Chinese characters, pinyin, Vietnamese meaning, or topic; filter by level; save
+words for review; and use the audio button for browser speech. Saved words are
+stored in the current browser's local storage. This is a learning sample, not a
+complete or official HSK vocabulary catalog.
+
 ## Configure Firebase
 
 1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/).

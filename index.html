@@ -1,0 +1,931 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7fb">
+    <title>KaiHSK — Học tiếng Trung mỗi ngày</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap");
+
+      :root {
+        color-scheme: light;
+        --ink: #20233a;
+        --muted: #898da3;
+        --purple: #6c63e8;
+        --purple-dark: #5148cf;
+        --purple-soft: #f0efff;
+        --line: #eeeef4;
+        --canvas: #f7f8fc;
+        --white: #fff;
+        --green: #39aa82;
+        --orange: #f2a75b;
+        --shadow: 0 12px 36px rgb(34 39 74 / 5%);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background: var(--canvas);
+        color: var(--ink);
+        font-family: "DM Sans", "Noto Sans SC", sans-serif;
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button, input { font: inherit; }
+      button { cursor: pointer; }
+
+      .app { display: flex; min-height: 100vh; }
+
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 3;
+        display: flex;
+        width: 238px;
+        flex-direction: column;
+        padding: 28px 17px 20px;
+        background: var(--white);
+        border-right: 1px solid #f0f0f5;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 42px 9px;
+        color: var(--ink);
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -.7px;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border-radius: 12px;
+        background: var(--purple);
+        color: white;
+        font-family: "Noto Sans SC", sans-serif;
+        font-size: 20px;
+        font-weight: 600;
+      }
+
+      .nav-label {
+        margin: 0 0 12px 12px;
+        color: #b0b2c2;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.15px;
+        text-transform: uppercase;
+      }
+
+      .nav { display: grid; gap: 5px; }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        min-height: 45px;
+        padding: 0 13px;
+        border: 0;
+        border-radius: 11px;
+        background: transparent;
+        color: #777b91;
+        text-align: left;
+        transition: .18s ease;
+      }
+
+      .nav-link:hover { background: #f8f8fc; color: var(--ink); }
+      .nav-link.active { background: var(--purple-soft); color: var(--purple); font-weight: 700; }
+      .nav-icon { display: grid; width: 20px; place-items: center; font-size: 17px; }
+
+      .sidebar-bottom { margin-top: auto; }
+
+      .help-card {
+        padding: 17px 15px;
+        border-radius: 15px;
+        background: #f8f7ff;
+      }
+
+      .help-card .help-icon { font-size: 20px; }
+      .help-card h3 { margin: 10px 0 5px; font-size: 13px; }
+      .help-card p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+      .help-card button {
+        margin-top: 12px;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--purple);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .user-mini {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 18px;
+        padding: 13px 5px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .avatar {
+        display: grid;
+        width: 36px;
+        height: 36px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 50%;
+        background: #f6d9cd;
+        font-size: 19px;
+      }
+
+      .user-mini strong { display: block; font-size: 12px; }
+      .user-mini span { color: var(--muted); font-size: 10px; }
+
+      .main { width: calc(100% - 238px); margin-left: 238px; }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        height: 78px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 43px;
+        border-bottom: 1px solid #f0f0f5;
+        background: rgb(247 248 252 / 92%);
+        backdrop-filter: blur(14px);
+      }
+
+      .breadcrumb { color: var(--muted); font-size: 12px; }
+      .breadcrumb strong { color: var(--ink); font-weight: 600; }
+      .top-actions { display: flex; align-items: center; gap: 17px; }
+
+      .search {
+        display: flex;
+        width: 224px;
+        height: 38px;
+        align-items: center;
+        gap: 8px;
+        padding: 0 12px;
+        border: 1px solid #ebebf2;
+        border-radius: 9px;
+        background: white;
+        color: #9a9daf;
+      }
+
+      .search input { width: 100%; border: 0; outline: 0; color: var(--ink); font-size: 11px; }
+      .search input::placeholder { color: #aaaebe; }
+      .icon-button {
+        position: relative;
+        display: grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border: 0;
+        border-radius: 10px;
+        background: white;
+        color: #70748a;
+        font-size: 16px;
+      }
+
+      .notification-dot {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        width: 6px;
+        height: 6px;
+        border: 1px solid white;
+        border-radius: 50%;
+        background: #f17e83;
+      }
+
+      .content { width: min(1120px, 100%); margin: 0 auto; padding: 34px 43px 48px; }
+      .welcome { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 25px; }
+      .eyebrow { margin: 0 0 8px; color: var(--purple); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+      h1 { margin: 0; font-size: clamp(24px, 3vw, 30px); letter-spacing: -1.05px; }
+      .welcome p { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+
+      .date-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 13px;
+        border: 1px solid #eeeef4;
+        border-radius: 10px;
+        background: white;
+        color: #71758a;
+        font-size: 11px;
+      }
+
+      .hero {
+        position: relative;
+        display: grid;
+        min-height: 206px;
+        grid-template-columns: 1fr 250px;
+        overflow: hidden;
+        align-items: center;
+        padding: 30px 34px;
+        border-radius: 19px;
+        background: linear-gradient(110deg, #6c63e8 0%, #8177ee 58%, #9a8df0 100%);
+        color: white;
+        box-shadow: 0 14px 28px rgb(108 99 232 / 18%);
+      }
+
+      .hero::after {
+        position: absolute;
+        top: -100px;
+        right: 180px;
+        width: 300px;
+        height: 300px;
+        border: 1px solid rgb(255 255 255 / 12%);
+        border-radius: 50%;
+        content: "";
+      }
+
+      .hero-copy { position: relative; z-index: 1; }
+      .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 9px;
+        border: 1px solid rgb(255 255 255 / 23%);
+        border-radius: 20px;
+        background: rgb(255 255 255 / 10%);
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: .4px;
+      }
+
+      .hero h2 { margin: 14px 0 7px; font-size: 23px; letter-spacing: -.65px; }
+      .hero p { max-width: 430px; margin: 0; color: rgb(255 255 255 / 78%); font-size: 11px; line-height: 1.65; }
+      .primary-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        margin-top: 18px;
+        padding: 10px 15px;
+        border: 0;
+        border-radius: 9px;
+        background: white;
+        color: var(--purple-dark);
+        font-size: 11px;
+        font-weight: 700;
+        transition: transform .18s ease, box-shadow .18s ease;
+      }
+
+      .primary-button:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgb(29 24 99 / 16%); }
+
+      .hero-art {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        width: 184px;
+        height: 155px;
+        place-items: center;
+        justify-self: center;
+      }
+
+      .hero-orbit {
+        position: absolute;
+        width: 138px;
+        height: 138px;
+        border: 1px solid rgb(255 255 255 / 28%);
+        border-radius: 50%;
+      }
+
+      .hero-orbit::before, .hero-orbit::after {
+        position: absolute;
+        border: 1px solid rgb(255 255 255 / 22%);
+        border-radius: 50%;
+        content: "";
+      }
+
+      .hero-orbit::before { inset: 14px; }
+      .hero-orbit::after { inset: 29px; }
+      .hero-kanji { z-index: 1; font-family: "Noto Sans SC", sans-serif; font-size: 75px; font-weight: 600; text-shadow: 0 7px 20px rgb(57 45 158 / 22%); }
+      .sparkle { position: absolute; color: #ffe6a9; font-size: 19px; }
+      .sparkle.one { top: 15px; right: 27px; }
+      .sparkle.two { bottom: 17px; left: 17px; font-size: 13px; }
+      .floating-dot { position: absolute; top: 28px; left: 22px; width: 7px; height: 7px; border-radius: 50%; background: #ffdda0; }
+
+      .section-heading { display: flex; align-items: center; justify-content: space-between; margin: 28px 0 14px; }
+      .section-heading h2 { margin: 0; font-size: 15px; letter-spacing: -.25px; }
+      .section-heading p { margin: 4px 0 0; color: var(--muted); font-size: 10px; }
+      .text-button { padding: 5px 0; border: 0; background: none; color: var(--purple); font-size: 10px; font-weight: 700; }
+
+      .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; }
+      .stat-card {
+        display: flex;
+        min-height: 91px;
+        align-items: center;
+        gap: 12px;
+        padding: 15px;
+        border: 1px solid #f0f0f5;
+        border-radius: 13px;
+        background: white;
+      }
+
+      .stat-icon {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 11px;
+        font-size: 16px;
+      }
+
+      .stat-icon.purple { background: #f0efff; color: #776fe2; }
+      .stat-icon.orange { background: #fff4e8; color: #e7a250; }
+      .stat-icon.green { background: #e9f8f2; color: #40a886; }
+      .stat-icon.pink { background: #fff0f2; color: #e78391; }
+      .stat-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: 10px; }
+      .stat-value { font-size: 17px; font-weight: 700; letter-spacing: -.5px; }
+      .stat-unit { margin-left: 3px; color: #9b9daf; font-size: 9px; font-weight: 500; }
+      .stat-note { margin-top: 4px; color: #50a889; font-size: 9px; }
+
+      .lower-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, .9fr); gap: 17px; margin-top: 25px; }
+      .panel { padding: 18px; border: 1px solid #f0f0f5; border-radius: 14px; background: white; }
+      .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+      .panel-header h2 { margin: 0; font-size: 13px; }
+      .panel-header a, .panel-header button { padding: 0; border: 0; background: none; color: var(--purple); font-size: 10px; font-weight: 700; text-decoration: none; }
+      .lesson-list { display: grid; gap: 8px; }
+      .lesson {
+        display: grid;
+        grid-template-columns: 37px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 11px;
+        padding: 10px;
+        border: 1px solid #f3f3f7;
+        border-radius: 11px;
+        transition: border-color .15s, background .15s;
+      }
+
+      .lesson:hover { border-color: #dedcff; background: #fdfdff; }
+      .lesson-number { display: grid; width: 35px; height: 35px; place-items: center; border-radius: 10px; background: #f0efff; color: var(--purple); font-size: 11px; font-weight: 700; }
+      .lesson:nth-child(2) .lesson-number { background: #fff4e8; color: #d89645; }
+      .lesson:nth-child(3) .lesson-number { background: #e9f8f2; color: #3c9b7a; }
+      .lesson:nth-child(4) .lesson-number { background: #fff0f2; color: #d87686; }
+      .lesson h3 { overflow: hidden; margin: 0 0 4px; font-size: 10px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+      .lesson p { margin: 0; color: var(--muted); font-size: 9px; }
+      .lesson-progress { display: flex; align-items: center; gap: 8px; }
+      .progress-track { width: 58px; height: 5px; overflow: hidden; border-radius: 8px; background: #f0f0f5; }
+      .progress-fill { height: 100%; border-radius: inherit; background: var(--purple); }
+      .lesson:nth-child(2) .progress-fill { background: #f2aa60; }
+      .lesson:nth-child(3) .progress-fill { background: #4ab38d; }
+      .lesson:nth-child(4) .progress-fill { background: #e9909d; }
+      .progress-label { width: 25px; color: #777b90; font-size: 9px; text-align: right; }
+      .lesson-arrow { display: grid; width: 24px; height: 24px; place-items: center; border: 0; border-radius: 7px; background: #f8f8fb; color: #8c8fa1; }
+      .empty-state { padding: 20px; color: var(--muted); font-size: 11px; text-align: center; }
+
+      .goal-panel { position: relative; overflow: hidden; }
+      .goal-panel::after { position: absolute; right: -40px; bottom: -64px; width: 150px; height: 150px; border: 20px solid #f8f7ff; border-radius: 50%; content: ""; }
+      .goal-top { display: flex; align-items: center; justify-content: space-between; }
+      .goal-top h2 { margin: 0; font-size: 13px; }
+      .goal-date { color: var(--muted); font-size: 9px; }
+      .goal-chart { display: flex; height: 105px; align-items: flex-end; justify-content: space-between; gap: 7px; margin-top: 21px; }
+      .day { display: flex; height: 100%; flex: 1; flex-direction: column; align-items: center; justify-content: flex-end; gap: 7px; }
+      .bar-wrap { display: flex; width: 100%; height: 77px; align-items: flex-end; justify-content: center; }
+      .bar { width: 15px; max-width: 100%; min-height: 7px; border-radius: 5px 5px 2px 2px; background: #e9e8fb; }
+      .day.current .bar { background: var(--purple); }
+      .day span { color: #a0a2b1; font-size: 8px; }
+      .goal-footer { position: relative; z-index: 1; display: flex; align-items: center; gap: 9px; margin-top: 16px; padding-top: 13px; border-top: 1px solid var(--line); }
+      .goal-footer strong { font-size: 10px; }
+      .goal-footer span { color: var(--muted); font-size: 9px; }
+      .goal-check { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 8px; background: #e9f8f2; color: #3ca480; }
+
+      .word-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 13px; border-radius: 11px; background: #fbfaff; }
+      .word-char { font-family: "Noto Sans SC", sans-serif; color: var(--purple); font-size: 29px; font-weight: 600; }
+      .word-info { flex: 1; }
+      .word-info strong { display: block; font-size: 11px; }
+      .word-info span { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+      .sound-button { display: grid; width: 31px; height: 31px; place-items: center; border: 0; border-radius: 9px; background: white; color: var(--purple); box-shadow: 0 2px 8px rgb(39 34 88 / 7%); }
+      .flashcard-button { width: 100%; margin-top: 10px; padding: 10px; border: 1px solid #e8e7fb; border-radius: 9px; background: white; color: var(--purple); font-size: 10px; font-weight: 700; }
+
+      .toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 10;
+        padding: 12px 16px;
+        transform: translateY(15px);
+        border-radius: 10px;
+        background: #25243b;
+        color: white;
+        font-size: 11px;
+        opacity: 0;
+        pointer-events: none;
+        transition: .2s ease;
+      }
+
+      .toast.show { transform: translateY(0); opacity: 1; }
+
+      .signup-trigger {
+        padding: 9px 13px;
+        border: 0;
+        border-radius: 9px;
+        background: var(--purple);
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        transition: background .18s ease, transform .18s ease;
+      }
+
+      .signup-trigger:hover { transform: translateY(-1px); background: var(--purple-dark); }
+
+      .signup-dialog {
+        width: min(420px, calc(100% - 32px));
+        padding: 0;
+        overflow: visible;
+        border: 0;
+        border-radius: 18px;
+        background: white;
+        box-shadow: 0 24px 80px rgb(23 24 55 / 22%);
+      }
+
+      .signup-dialog::backdrop { background: rgb(27 28 51 / 45%); backdrop-filter: blur(3px); }
+      .signup-content { position: relative; padding: 32px; text-align: center; }
+      .signup-close {
+        position: absolute;
+        top: 13px;
+        right: 13px;
+        display: grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        border: 0;
+        border-radius: 9px;
+        background: #f6f6fa;
+        color: #777b91;
+        font-size: 18px;
+      }
+      .signup-mark { display: grid; width: 48px; height: 48px; margin: 0 auto 15px; place-items: center; border-radius: 15px; background: var(--purple); color: white; font-family: "Noto Sans SC", sans-serif; font-size: 27px; font-weight: 600; }
+      .signup-content h2 { margin: 0; font-size: 21px; letter-spacing: -.5px; }
+      .signup-intro { margin: 9px auto 21px; color: var(--muted); font-size: 12px; line-height: 1.65; }
+      .google-signup {
+        display: flex;
+        width: 100%;
+        min-height: 45px;
+        align-items: center;
+        justify-content: center;
+        gap: 11px;
+        border: 1px solid #dadce0;
+        border-radius: 9px;
+        background: white;
+        color: #3c4043;
+        font-size: 12px;
+        font-weight: 600;
+        transition: background .15s, box-shadow .15s;
+      }
+      .google-signup:hover { background: #fafafa; box-shadow: 0 2px 6px rgb(60 64 67 / 15%); }
+      .google-signup svg { width: 18px; height: 18px; }
+      .signup-status { min-height: 36px; margin: 13px 0 0; color: #777b91; font-size: 10px; line-height: 1.6; }
+      .signup-status.error { color: #a44c41; }
+      .signup-divider { display: flex; align-items: center; gap: 10px; margin: 10px 0 0; color: #a0a2b1; font-size: 9px; }
+      .signup-divider::before, .signup-divider::after { height: 1px; flex: 1; background: var(--line); content: ""; }
+      .signup-footnote { margin: 14px 0 0; color: #a0a2b1; font-size: 9px; line-height: 1.6; }
+      .signout-button {
+        width: 100%;
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #eeeef4;
+        border-radius: 9px;
+        background: white;
+        color: #777b91;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      @media (max-width: 1050px) {
+        .sidebar { width: 205px; }
+        .main { width: calc(100% - 205px); margin-left: 205px; }
+        .content { padding-right: 28px; padding-left: 28px; }
+        .topbar { padding-right: 28px; padding-left: 28px; }
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        .hero { grid-template-columns: 1fr 190px; }
+      }
+
+      @media (max-width: 760px) {
+        .sidebar { width: 64px; align-items: center; padding: 18px 8px; }
+        .brand { margin: 0 0 36px; }
+        .brand-name, .nav-label, .nav-text, .sidebar-bottom { display: none; }
+        .nav { width: 100%; }
+        .nav-link { justify-content: center; padding: 0; }
+        .nav-icon { font-size: 18px; }
+        .main { width: calc(100% - 64px); margin-left: 64px; }
+        .topbar { height: 65px; padding: 0 18px; }
+        .content { padding: 25px 18px 35px; }
+        .search { width: 175px; }
+        .hero { min-height: 190px; grid-template-columns: 1fr 110px; padding: 23px; }
+        .hero-art { width: 110px; }
+        .hero-kanji { font-size: 58px; }
+        .hero-orbit { width: 105px; height: 105px; }
+        .hero-orbit::before { inset: 10px; }
+        .hero-orbit::after { inset: 21px; }
+        .lower-grid { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 480px) {
+        .breadcrumb { font-size: 10px; }
+        .top-actions { gap: 8px; }
+        .search { width: 38px; padding: 0 10px; border: 0; background: white; }
+        .search input { display: none; }
+        .welcome { align-items: flex-start; }
+        .date-chip { padding: 8px; font-size: 0; }
+        .date-chip span { font-size: 13px; }
+        .hero { grid-template-columns: 1fr; }
+        .hero-art { position: absolute; right: 1px; bottom: 0; width: 100px; height: 110px; opacity: .48; }
+        .hero-copy { max-width: 290px; }
+        .hero h2 { font-size: 20px; }
+        .hero p { max-width: 235px; }
+        .stats { gap: 8px; }
+        .stat-card { min-height: 80px; gap: 8px; padding: 10px; }
+        .stat-icon { width: 32px; height: 32px; }
+        .stat-value { font-size: 15px; }
+        .lesson { grid-template-columns: 34px minmax(0, 1fr) auto; gap: 7px; }
+        .progress-track { width: 40px; }
+        .progress-label { width: 22px; font-size: 8px; }
+        .lesson-arrow { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">汉</span><span class="brand-name">KaiHSK</span></div>
+        <p class="nav-label">Không gian học</p>
+        <nav class="nav" aria-label="Điều hướng chính">
+          <button class="nav-link active" data-section="Tổng quan"><span class="nav-icon">⌂</span><span class="nav-text">Tổng quan</span></button>
+          <button class="nav-link" data-section="Lộ trình HSK"><span class="nav-icon">▤</span><span class="nav-text">Lộ trình HSK</span></button>
+          <button class="nav-link" data-section="Từ vựng"><span class="nav-icon">文</span><span class="nav-text">Từ vựng</span></button>
+          <button class="nav-link" data-section="Luyện nghe"><span class="nav-icon">♫</span><span class="nav-text">Luyện nghe</span></button>
+          <button class="nav-link" data-section="Luyện viết"><span class="nav-icon">✎</span><span class="nav-text">Luyện viết</span></button>
+          <button class="nav-link" data-section="Thống kê"><span class="nav-icon">▥</span><span class="nav-text">Thống kê</span></button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="help-card">
+            <span class="help-icon">🌱</span>
+            <h3>Học một chút mỗi ngày</h3>
+            <p>Chỉ 15 phút mỗi ngày sẽ giúp bạn tiến bộ thật đều đặn.</p>
+            <button type="button" class="notify-action">Tìm hiểu thêm →</button>
+          </div>
+          <div class="user-mini">
+            <div class="avatar">👩🏻</div>
+            <div><strong>Minh Anh</strong><span>Người học HSK 1</span></div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="breadcrumb">Không gian học&nbsp; / &nbsp;<strong>Tổng quan</strong></div>
+          <div class="top-actions">
+            <label class="search"><span aria-hidden="true">⌕</span><input id="lesson-search" type="search" placeholder="Tìm bài học..." aria-label="Tìm bài học"></label>
+            <button class="signup-trigger" id="signup-open" type="button">Đăng ký</button>
+            <button class="icon-button notify-action" type="button" aria-label="Thông báo">♧<span class="notification-dot"></span></button>
+          </div>
+        </header>
+
+        <div class="content">
+          <section class="welcome">
+            <div>
+              <p class="eyebrow">Thứ ba, ngày 18 tháng 6</p>
+              <h1>Chào buổi sáng, <span id="greeting-name">Minh Anh</span> <span aria-hidden="true">☀️</span></h1>
+              <p>Sẵn sàng chinh phục thêm một bài học mới chưa?</p>
+            </div>
+            <div class="date-chip"><span aria-hidden="true">◷</span> Mục tiêu hôm nay&nbsp; <strong>15 phút</strong></div>
+          </section>
+
+          <section class="hero" aria-label="Bài học tiếp theo">
+            <div class="hero-copy">
+              <span class="hero-tag">✦ &nbsp;LỘ TRÌNH CỦA BẠN&nbsp; · &nbsp;HSK 1</span>
+              <h2>Tiếp tục hành trình nhé!</h2>
+              <p>Bạn đã hoàn thành 6 trên 20 bài học. Mỗi bước nhỏ hôm nay sẽ đưa bạn đến gần hơn với mục tiêu.</p>
+              <button class="primary-button" id="continue-learning" type="button">Học tiếp bài 7 <span aria-hidden="true">→</span></button>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+              <span class="hero-orbit"></span>
+              <span class="hero-kanji">学</span>
+              <span class="sparkle one">✦</span><span class="sparkle two">✧</span><span class="floating-dot"></span>
+            </div>
+          </section>
+
+          <section aria-labelledby="progress-title">
+            <div class="section-heading">
+              <div><h2 id="progress-title">Tiến độ học tập</h2><p>Những bước tiến đáng tự hào của bạn</p></div>
+              <button class="text-button" type="button" data-nav="Thống kê">Xem thống kê →</button>
+            </div>
+            <div class="stats">
+              <article class="stat-card">
+                <div class="stat-icon purple">▤</div>
+                <div><span class="stat-label">Bài học hoàn thành</span><strong class="stat-value">6<span class="stat-unit">/ 20 bài</span></strong><div class="stat-note">↑ 2 bài tuần này</div></div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-icon orange">文</div>
+                <div><span class="stat-label">Từ vựng đã học</span><strong class="stat-value">128<span class="stat-unit">từ</span></strong><div class="stat-note">↑ 24 từ tuần này</div></div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-icon green">◷</div>
+                <div><span class="stat-label">Thời gian học</span><strong class="stat-value">4.5<span class="stat-unit">giờ</span></strong><div class="stat-note">↑ 30 phút tuần này</div></div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-icon pink">♨</div>
+                <div><span class="stat-label">Chuỗi ngày học</span><strong class="stat-value">5<span class="stat-unit">ngày</span></strong><div class="stat-note">Tuyệt vời, cứ tiếp tục!</div></div>
+              </article>
+            </div>
+          </section>
+
+          <div class="lower-grid">
+            <section class="panel" aria-labelledby="lessons-title">
+              <div class="panel-header">
+                <div><h2 id="lessons-title">Bài học gần đây</h2><p style="margin:4px 0 0;color:var(--muted);font-size:9px">Tiếp tục từ nơi bạn đã dừng lại</p></div>
+                <button type="button" data-nav="Lộ trình HSK">Tất cả bài học →</button>
+              </div>
+              <div class="lesson-list" id="lesson-list">
+                <article class="lesson" data-search="chào hỏi xin chào 你好">
+                  <div class="lesson-number">01</div><div><h3>Xin chào! — 你好</h3><p>12 từ vựng &nbsp;·&nbsp; 8 phút</p></div>
+                  <div class="lesson-progress"><div class="progress-track"><div class="progress-fill" style="width:100%"></div></div><span class="progress-label">100%</span><button class="lesson-arrow lesson-action" type="button" aria-label="Ôn lại bài Xin chào">↗</button></div>
+                </article>
+                <article class="lesson" data-search="giới thiệu bản thân 我">
+                  <div class="lesson-number">02</div><div><h3>Giới thiệu bản thân — 我</h3><p>15 từ vựng &nbsp;·&nbsp; 10 phút</p></div>
+                  <div class="lesson-progress"><div class="progress-track"><div class="progress-fill" style="width:75%"></div></div><span class="progress-label">75%</span><button class="lesson-arrow lesson-action" type="button" aria-label="Học bài Giới thiệu bản thân">↗</button></div>
+                </article>
+                <article class="lesson" data-search="gia đình 家人">
+                  <div class="lesson-number">03</div><div><h3>Gia đình của tôi — 家人</h3><p>10 từ vựng &nbsp;·&nbsp; 7 phút</p></div>
+                  <div class="lesson-progress"><div class="progress-track"><div class="progress-fill" style="width:30%"></div></div><span class="progress-label">30%</span><button class="lesson-arrow lesson-action" type="button" aria-label="Học bài Gia đình của tôi">↗</button></div>
+                </article>
+                <article class="lesson" data-search="bạn bè 朋友">
+                  <div class="lesson-number">04</div><div><h3>Bạn bè — 朋友</h3><p>14 từ vựng &nbsp;·&nbsp; 9 phút</p></div>
+                  <div class="lesson-progress"><div class="progress-track"><div class="progress-fill" style="width:0%"></div></div><span class="progress-label">Mới</span><button class="lesson-arrow lesson-action" type="button" aria-label="Bắt đầu bài Bạn bè">↗</button></div>
+                </article>
+              </div>
+              <div class="empty-state" id="empty-state" hidden>Không tìm thấy bài học phù hợp.</div>
+            </section>
+
+            <div>
+              <section class="panel goal-panel" aria-labelledby="goal-title">
+                <div class="goal-top"><h2 id="goal-title">Mục tiêu tuần này</h2><span class="goal-date">12 – 18/06</span></div>
+                <div class="goal-chart" aria-label="Biểu đồ thời lượng học trong tuần">
+                  <div class="day"><div class="bar-wrap"><div class="bar" style="height:46%"></div></div><span>T2</span></div>
+                  <div class="day"><div class="bar-wrap"><div class="bar" style="height:73%"></div></div><span>T3</span></div>
+                  <div class="day"><div class="bar-wrap"><div class="bar" style="height:58%"></div></div><span>T4</span></div>
+                  <div class="day"><div class="bar-wrap"><div class="bar" style="height:88%"></div></div><span>T5</span></div>
+                  <div class="day"><div class="bar-wrap"><div class="bar" style="height:37%"></div></div><span>T6</span></div>
+                  <div class="day"><div class="bar-wrap"><div class="bar" style="height:65%"></div></div><span>T7</span></div>
+                  <div class="day current"><div class="bar-wrap"><div class="bar" style="height:24%"></div></div><span>CN</span></div>
+                </div>
+                <div class="goal-footer"><span class="goal-check">✓</span><div><strong>75 / 105 phút</strong><br><span>Còn 30 phút để hoàn thành mục tiêu</span></div></div>
+              </section>
+
+              <section class="panel" style="margin-top:15px" aria-labelledby="word-title">
+                <div class="panel-header" style="margin-bottom:0"><h2 id="word-title">Từ vựng hôm nay</h2><span style="color:var(--muted);font-size:9px">HSK 1 · #129</span></div>
+                <div class="word-row">
+                  <span class="word-char">朋友</span>
+                  <div class="word-info"><strong>péng you</strong><span>bạn bè, người bạn</span></div>
+                  <button class="sound-button" id="speak-word" type="button" aria-label="Nghe phát âm">♫</button>
+                </div>
+                <button class="flashcard-button" id="review-word" type="button">Ôn tập từ vựng&nbsp; →</button>
+              </section>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <dialog class="signup-dialog" id="signup-dialog" aria-labelledby="signup-title">
+      <div class="signup-content">
+        <button class="signup-close" id="signup-close" type="button" aria-label="Đóng">×</button>
+        <span class="signup-mark" aria-hidden="true">汉</span>
+        <h2 id="signup-title">Bắt đầu học cùng KaiHSK</h2>
+        <p class="signup-intro">Tạo tài khoản để lưu tiến độ và cùng bạn chinh phục từng cấp độ HSK.</p>
+        <button class="google-signup" id="google-signup" type="button">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z" transform="translate(0 4)"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94a11.07 11.07 0 0 1-4.8 7.27l7.74 6c4.52-4.17 7.1-10.32 7.1-17.74Z"/>
+            <path fill="#FBBC05" d="M10.53 28.59a14.39 14.39 0 0 1 0-9.18l-7.98-6.2a23.9 23.9 0 0 0 0 21.58l7.98-6.2Z" transform="translate(0 4)"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.74-6c-2.15 1.45-4.9 2.3-8.16 2.3-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z" transform="translate(0 -4)"/>
+          </svg>
+          Tiếp tục với Google
+        </button>
+        <p class="signup-status" id="signup-status" role="status" aria-live="polite"></p>
+        <button class="signout-button" id="google-signout" type="button" hidden>Đăng xuất</button>
+        <div class="signup-divider"><span>Đăng ký nhanh chóng và an toàn</span></div>
+        <p class="signup-footnote">Tiếp tục đồng nghĩa với việc bạn chấp nhận Điều khoản dịch vụ và Chính sách quyền riêng tư của KaiHSK.</p>
+      </div>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+      const toast = document.querySelector("#toast");
+      let toastTimer;
+      const signupDialog = document.querySelector("#signup-dialog");
+      const signupStatus = document.querySelector("#signup-status");
+      const googleButton = document.querySelector("#google-signup");
+      const signoutButton = document.querySelector("#google-signout");
+      const signupTitle = document.querySelector("#signup-title");
+      const signupIntro = document.querySelector(".signup-intro");
+      const signupFootnote = document.querySelector(".signup-footnote");
+      let firebaseAuth = null;
+      let currentUser = null;
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2400);
+      }
+
+      function setSignupStatus(message, isError) {
+        signupStatus.textContent = message;
+        signupStatus.classList.toggle("error", isError);
+      }
+
+      function updateAccountUI(user) {
+        currentUser = user;
+        const accountName = user?.displayName || user?.email?.split("@")[0];
+        const name = document.querySelector(".user-mini strong");
+        const detail = document.querySelector(".user-mini span");
+        const avatar = document.querySelector(".user-mini .avatar");
+        const signupTrigger = document.querySelector("#signup-open");
+
+        if (user) {
+          name.textContent = accountName || "Học viên KaiHSK";
+          detail.textContent = user.email || "Tài khoản Google";
+          avatar.textContent = accountName?.trim().charAt(0).toLocaleUpperCase("vi") || "学";
+          document.querySelector("#greeting-name").textContent = accountName || "bạn";
+          signupTrigger.textContent = "Tài khoản";
+          signupTitle.textContent = "Tài khoản KaiHSK";
+          signupIntro.textContent = user.email || "Bạn đã đăng nhập bằng Google.";
+          googleButton.innerHTML = `${googleButton.querySelector("svg").outerHTML} Chọn tài khoản Google khác`;
+          signoutButton.hidden = false;
+          signupFootnote.textContent = "Tiến độ học tập của bạn sẽ được liên kết với tài khoản này.";
+        } else {
+          name.textContent = "Minh Anh";
+          detail.textContent = "Người học HSK 1";
+          avatar.textContent = "👩🏻";
+          document.querySelector("#greeting-name").textContent = "Minh Anh";
+          signupTrigger.textContent = "Đăng ký";
+          signupTitle.textContent = "Bắt đầu học cùng KaiHSK";
+          signupIntro.textContent = "Tạo tài khoản để lưu tiến độ và cùng bạn chinh phục từng cấp độ HSK.";
+          googleButton.innerHTML = `${googleButton.querySelector("svg").outerHTML} Tiếp tục với Google`;
+          signoutButton.hidden = true;
+          signupFootnote.textContent = "Tiếp tục đồng nghĩa với việc bạn chấp nhận Điều khoản dịch vụ và Chính sách quyền riêng tư của KaiHSK.";
+        }
+      }
+
+      const firebaseConfig = window.KAIHSK_FIREBASE_CONFIG;
+      const configIsReady = firebaseConfig &&
+        ["apiKey", "authDomain", "projectId", "appId"].every((key) =>
+          typeof firebaseConfig[key] === "string" &&
+          firebaseConfig[key].trim() !== "" &&
+          !firebaseConfig[key].includes("YOUR_")
+        );
+
+      if (configIsReady && window.firebase) {
+        try {
+          firebase.initializeApp(firebaseConfig);
+          firebaseAuth = firebase.auth();
+          firebaseAuth.useDeviceLanguage();
+          firebaseAuth.onAuthStateChanged(updateAccountUI, (error) => {
+            setSignupStatus(`Không thể kiểm tra trạng thái đăng nhập: ${error.message}`, true);
+          });
+        } catch (error) {
+          console.error("Firebase initialization failed:", error);
+        }
+      }
+
+      document.querySelector("#signup-open").addEventListener("click", () => {
+        setSignupStatus("", false);
+        signupDialog.showModal();
+      });
+
+      document.querySelector("#signup-close").addEventListener("click", () => signupDialog.close());
+
+      signupDialog.addEventListener("click", (event) => {
+        if (event.target === signupDialog) signupDialog.close();
+      });
+
+      document.querySelector("#google-signup").addEventListener("click", () => {
+        if (!firebaseAuth) {
+          setSignupStatus("Chưa cấu hình Firebase. Hãy làm theo hướng dẫn trong README.md rồi tải lại trang.", true);
+          return;
+        }
+
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: "select_account" });
+        googleButton.disabled = true;
+        setSignupStatus("Đang kết nối với Google…", false);
+
+        firebaseAuth.signInWithPopup(provider)
+          .then((result) => {
+            const isNewUser = result.additionalUserInfo?.isNewUser;
+            setSignupStatus(isNewUser ? "Tạo tài khoản KaiHSK thành công!" : "Đăng nhập thành công!", false);
+            showToast(isNewUser ? "Chào mừng bạn đến với KaiHSK!" : "Đăng nhập thành công.");
+            window.setTimeout(() => signupDialog.close(), 900);
+          })
+          .catch((error) => {
+            const messages = {
+              "auth/popup-closed-by-user": "Bạn đã đóng cửa sổ đăng nhập Google.",
+              "auth/popup-blocked": "Trình duyệt đã chặn cửa sổ đăng nhập. Hãy cho phép popup rồi thử lại.",
+              "auth/unauthorized-domain": "Tên miền hiện tại chưa được thêm vào Firebase Authentication → Authorized domains.",
+              "auth/operation-not-allowed": "Đăng nhập Google chưa được bật trong Firebase Authentication.",
+              "auth/cancelled-popup-request": "Một cửa sổ đăng nhập khác đang được mở."
+            };
+            console.error("Google sign-in failed:", error);
+            setSignupStatus(messages[error.code] || `Đăng nhập Google thất bại: ${error.message}`, true);
+          })
+          .finally(() => {
+            googleButton.disabled = false;
+          });
+      });
+
+      signoutButton.addEventListener("click", () => {
+        if (!firebaseAuth) return;
+        signoutButton.disabled = true;
+        firebaseAuth.signOut()
+          .then(() => {
+            setSignupStatus("Bạn đã đăng xuất khỏi KaiHSK.", false);
+            showToast("Đã đăng xuất.");
+          })
+          .catch((error) => {
+            console.error("Firebase sign-out failed:", error);
+            setSignupStatus(`Không thể đăng xuất: ${error.message}`, true);
+          })
+          .finally(() => {
+            signoutButton.disabled = false;
+          });
+      });
+
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          document.querySelectorAll(".nav-link").forEach((item) => item.classList.remove("active"));
+          link.classList.add("active");
+          document.querySelector(".breadcrumb strong").textContent = link.dataset.section;
+          if (link.dataset.section !== "Tổng quan") showToast(`Đang xem mục ${link.dataset.section}`);
+        });
+      });
+
+      document.querySelectorAll("[data-nav]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const target = document.querySelector(`.nav-link[data-section="${button.dataset.nav}"]`);
+          if (target) target.click();
+        });
+      });
+
+      document.querySelector("#continue-learning").addEventListener("click", () => {
+        showToast("Bài 7 — Bạn bè: sẵn sàng bắt đầu!");
+      });
+
+      document.querySelectorAll(".lesson-action").forEach((button) => {
+        button.addEventListener("click", () => {
+          const title = button.closest(".lesson").querySelector("h3").textContent;
+          showToast(`Đang mở bài học: ${title}`);
+        });
+      });
+
+      document.querySelector("#lesson-search").addEventListener("input", (event) => {
+        const query = event.target.value.trim().toLocaleLowerCase("vi");
+        let visibleCount = 0;
+        document.querySelectorAll(".lesson").forEach((lesson) => {
+          const visible = `${lesson.dataset.search} ${lesson.textContent}`.toLocaleLowerCase("vi").includes(query);
+          lesson.hidden = !visible;
+          if (visible) visibleCount += 1;
+        });
+        document.querySelector("#empty-state").hidden = visibleCount > 0;
+      });
+
+      document.querySelectorAll(".notify-action").forEach((button) => {
+        button.addEventListener("click", () => showToast("Bạn đang có một chuỗi học tập 5 ngày. Cố lên nhé!"));
+      });
+
+      document.querySelector("#speak-word").addEventListener("click", () => {
+        if (!("speechSynthesis" in window)) {
+          showToast("Trình duyệt này chưa hỗ trợ phát âm.");
+          return;
+        }
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance("朋友");
+        utterance.lang = "zh-CN";
+        window.speechSynthesis.speak(utterance);
+      });
+
+      document.querySelector("#review-word").addEventListener("click", () => {
+        const button = document.querySelector("#review-word");
+        const isRevealed = button.dataset.revealed === "true";
+        button.dataset.revealed = String(!isRevealed);
+        button.textContent = isRevealed ? "Ôn tập từ vựng  →" : "朋友 · péng you · bạn bè";
+      });
+    </script>
+  </body>
+</html>
